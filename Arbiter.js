@@ -2,7 +2,8 @@
 Arbiter.js
 	by Matt Kruse 
 	http://ArbiterJS.com - See site for documentation
-Dual licensed under the MIT and GPL licenses.
+	
+	This work is in the public domain and may be used in any way, for any purpose, without restriction.
 */
 var Arbiter = (function () {
 	var create_arbiter = function () {

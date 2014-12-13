@@ -5,7 +5,16 @@ Arbiter.js
 	
 	This work is in the public domain and may be used in any way, for any purpose, without restriction.
 */
-var Arbiter = (function () {
+
+(function (root, factory) {
+	if (typeof define === 'function' && define.amd) {
+		// AMD. Register as an anonymous module.
+		define([], factory);
+	} else {
+		// Browser globals
+		root.Arbiter = factory();
+	}
+}(this, function () {
 	var create_arbiter = function () {
 		var subscriptions = {};
 		var wildcard_subscriptions = {};
@@ -36,13 +45,13 @@ var Arbiter = (function () {
 					if (/\*$/.test(msg)) {
 						wildcard = true;
 						msg = msg.replace(/\*$/,'');
-						subscription_list = wildcard_subscriptions[msg];				
+						subscription_list = wildcard_subscriptions[msg];
 						if (!subscription_list) {
 							wildcard_subscriptions[msg] = subscription_list = [];
 						}
 					}
 					else {
-						subscription_list = subscriptions[msg];				
+						subscription_list = subscriptions[msg];
 						if (!subscription_list) {
 							subscriptions[msg] = subscription_list = [];
 						}
@@ -63,7 +72,7 @@ var Arbiter = (function () {
 						subscriptions[msg] = subscription_list;
 					}
 					return_ids.push(id);
-					
+
 					// Check to see if there are any persistent messages that need
 					// to be fired immediately
 					if (!options.persist && persistent_messages[msg]) {
@@ -79,7 +88,7 @@ var Arbiter = (function () {
 				}
 				return return_ids[0];
 			}
-			
+
 			,'publish': function(msg, data, options) {
 				var async_timeout=10,result,overall_result=true,cancelable=true,internal_data={},subscriber, wildcard_msg;
 				var subscription_list = subscriptions[msg] || [];
@@ -96,15 +105,15 @@ var Arbiter = (function () {
 					}
 					persistent_messages[msg].push( data );
 				}
-				if (subscription_list.length==0) { 
-					return overall_result; 
+				if (subscription_list.length==0) {
+					return overall_result;
 				}
 				if (typeof options.cancelable=="boolean") {
 					cancelable = options.cancelable;
 				}
 				for (var i=0; i<subscription_list.length; i++) {
 					subscriber = subscription_list[i];
-					if (subscriber.unsubscribed) { 
+					if (subscriber.unsubscribed) {
 						continue; // Ignore unsubscribed listeners
 					}
 					try {
@@ -129,25 +138,24 @@ var Arbiter = (function () {
 				}
 				return overall_result;
 			}
-			
+
 			,'unsubscribe': function(id) {
 				if (id_lookup[id]) {
-					 id_lookup[id].unsubscribed = true;
-					 return true;
+					id_lookup[id].unsubscribed = true;
+					return true;
 				}
 				return false;
 			}
-			
+
 			,'resubscribe': function(id) {
 				if (id_lookup[id]) {
-					 id_lookup[id].unsubscribed = false;
-					 return true;
+					id_lookup[id].unsubscribed = false;
+					return true;
 				}
 				return false;
 			}
-			
+
 		};
 	};
 	return create_arbiter();
-	
-})();
+}));
